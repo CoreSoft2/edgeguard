@@ -14,7 +14,7 @@ DOMLoadedCallbacks.push(function() {
     watchElementAttributes(el, attributes, originalValues);
   }
 
-  if (capabilities.hasMutationObserver) {
+  if (hasMutationObserver) {
     var callback = function(mutationRecords) {
       for (var i = 0; i < mutationRecords.length; ++i) {
         var record = mutationRecords[i];
@@ -30,7 +30,7 @@ DOMLoadedCallbacks.push(function() {
         }
       }
     }
-    var observer = new capabilities.mutationObserverObject(callback);
+    var observer = new mutationObserverObject(callback);
     observer.observe(document.body, {
       childList: true,
       subtree: true

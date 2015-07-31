@@ -34,7 +34,7 @@ var detectChanges = function(el, values) {
   }
 }
 
-if (capabilities.hasMutationObserver) {
+if (hasMutationObserver) {
   
   watchElementAttributes = function(el, attributes, initialValues) {
     setLastValues(el, initialValues);
@@ -53,7 +53,7 @@ if (capabilities.hasMutationObserver) {
         }
       }
     }
-    var attributeObserver = new capabilities.mutationObserverObject(observerCallback);
+    var attributeObserver = new mutationObserverObject(observerCallback);
     attributeObserver.observe(el, {      
       attributes: true,
       attributeFilter: attributes

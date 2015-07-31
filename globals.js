@@ -5,10 +5,9 @@ for (var i = 0; i < 4; ++i) {
 
 var windowLocation = window.location;
 
-var capabilities = {}
-capabilities.mutationObserverObject = (window.MutationObserver || window.WebKitMutationObserver);
-capabilities.hasMutationObserver = !!(capabilities.mutationObserverObject);
-capabilities.hasCORS = 'withCredentials' in new XMLHttpRequest();
+var mutationObserverObject = (window.MutationObserver || window.WebKitMutationObserver);
+var hasMutationObserver = !!(mutationObserverObject);
+var hasCORS = 'withCredentials' in new XMLHttpRequest();
 
 var DOMLoadedCallbacks = [];
 

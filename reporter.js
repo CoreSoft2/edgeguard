@@ -1,4 +1,4 @@
-var endpoint = 'http://localhost:3001/events';
+var endpoint = 'http://localhost:3000/events';
 
 var count = 0;
 var queue = [];
@@ -47,9 +47,11 @@ var flushQueue = function() {
   if (!validationSent) {
     queue.unshift({t: 'v', mh: mouseHistorySerialized, hc: hasCORS, 
       hmo: hasMutationObserver, ts: timestamp, 
-      dl: DOMLoadTime, hws: hasWebSockets});
+      dl: DOMLoadTime, hws: hasWebSockets, sid: sessionId});
     validationSent = true;
-  }  
+  } else {
+    queue.unshift({t: 'm', sid: sessionId});
+  }
   deliver(queue);
   queue = [];
 }
@@ -66,7 +68,7 @@ var queuePayload = function(obj) {
   //no queues, just send for now.
   obj[originKey] = windowLocation.origin;
   obj[pathKey] = windowLocation.pathname;
-  obj[paramsKey] = windowLocation.search  
+  obj[paramsKey] = windowLocation.search;
 
   queue.push(obj);  
   

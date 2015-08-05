@@ -4,11 +4,12 @@ DOMLoadedCallbacks.push(function() {
     var attributes = elementAttributes[type];
     var originalValues = {}
     for (var i = 0; i < attributes.length; ++i) {
+      if (extractAttribute(el, egDataKey) == sessionId) { continue; }
       var attribute = attributes[i];
       var val = extractAttribute(el, attribute);
       originalValues[attribute] = val;
-      if (isBadUrl(val)) {
-        queue_payload({url: val, method: 'GET', source: type + "_" + attribute});
+      if (isBadUrl(val)) {        
+        queuePayload(buildPayload('GET', val, type + "_" + attribute));
       }
     }
     watchElementAttributes(el, attributes, originalValues);
@@ -31,7 +32,7 @@ DOMLoadedCallbacks.push(function() {
       }
     }
     var observer = new mutationObserverObject(callback);
-    observer.observe(document.body, {
+    observer.observe(body, {
       childList: true,
       subtree: true
     });

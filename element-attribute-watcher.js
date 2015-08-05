@@ -48,8 +48,8 @@ if (hasMutationObserver) {
           newValues[attribute] = extractAttribute(target, attribute);
         }
         var changed = detectChanges(target, newValues);
-        for (var k in changed) {
-          queuePayload({url: changed[k], method: 'GET', source: tagName + "_" + k});
+        for (var k in changed) {          
+          queuePayload(buildPayload('GET', changed[k], tagName + "_" + k));
         }
       }
     }

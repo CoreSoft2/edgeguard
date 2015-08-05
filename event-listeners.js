@@ -1,31 +1,34 @@
 
 DOMLoadedCallbacks.push(function() {
 
-  document.body.addEventListener("click", function(e) {
-    if (e.target.nodeName == 'A') {
-      var href = e.target.getAttribute('href');
+  body.addEventListener("click", function(e) {
+    var target = e.target;
+    if (target.nodeName == 'A') {
+      var href = extractAttribute(target, 'href');
       if (isBadUrl(href)) {
         e.preventDefault();
         queuePayload({method: 'GET', url: href, source: 'link_click'})
-        console.log('redirecting to ' + href)
-        window.setTimeout(function() {
-          window.location.href = href;
+        flushQueue();        
+        windowObject.setTimeout(function() {
+          windowLocation.href = href;
         }, 100);
       }      
     };
   });
 
-  document.body.addEventListener("submit", function(e) {
-    if (e.target.nodeName == 'FORM') {
-      var action = e.target.getAttribute('action');
-      var method = e.target.getAttribute('method');
+  body.addEventListener("submit", function(e) {
+    var target = e.target;
+    if (target.nodeName == 'FORM') {
+      var action = extractAttribute(target, 'action');
+      var method = extractAttribute(target, 'method');
       if (!method) { method = 'GET' };
       if (isBadUrl(action)) {
         console.log('remote');
         e.preventDefault();
         queuePayload({method: method, url: action, source: 'form_submit'});
-        window.setTimeout(function() {
-          e.target.submit();
+        flushQueue();
+        windowObject.setTimeout(function() {
+          target.submit();
         }, 100);
       }
     }

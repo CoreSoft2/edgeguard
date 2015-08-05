@@ -1,23 +1,54 @@
-var nonce = "";
-for (var i = 0; i < 4; ++i) {
-  nonce += Math.floor(Math.random() * 65536).toString(16);
+var generateTimestamp = function() {
+  var current = new Date();
+  return Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 
+    current.getUTCDate(), current.getUTCHours(), current.getUTCMinutes(), 
+    current.getUTCSeconds(), current.getUTCMilliseconds());
 }
 
-var windowLocation = window.location;
+var timestamp = generateTimestamp();
+var DOMLoadTime;
 
-var mutationObserverObject = (window.MutationObserver || window.WebKitMutationObserver);
+var windowObject = window;
+var windowLocation = windowObject.location;
+var documentObject = document;
+var body = null;
+
+var originKey = 'o'
+var pathKey = 'p'
+var paramsKey = 'ps'
+var urlKey = 'u'
+var sourceKey = 's'
+var methodKey = 'm'
+
+var buildPayload = function(method, url, source) {
+  var ret = {}
+  ret[methodKey] = method
+  ret[urlKey] = url
+  ret[sourceKey] = source
+  return ret;
+}
+
+var mutationObserverObject = (windowObject.MutationObserver || windowObject.WebKitMutationObserver);
 var hasMutationObserver = !!(mutationObserverObject);
+var hasWebSockets = 'WebSocket' in window || 'MozWebSocket' in window;
 var hasCORS = 'withCredentials' in new XMLHttpRequest();
 
 var DOMLoadedCallbacks = [];
+var validationReadyCallbacks = [];
 
+var srcParam = 'src';
 var elementAttributes = {
-  IMG: ['src'],
-  SCRIPT: ['src'],
+  IMG: [srcParam],
+  SCRIPT: [srcParam],
   OBJECT: ['data'],
-  IFRAME: ['src'],
+  IFRAME: [srcParam],
   LINK: ['href']
 };
+
+var sessionId = null;
+
+var mouseHistory = null;
+var mouseHistorySerialized = null;
 
 var extractAttribute = function(element, attribute) {
   return element[attribute] || element.getAttribute(attribute);

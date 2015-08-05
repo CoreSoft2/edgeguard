@@ -9,9 +9,9 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['globals.js', 'reporter.js', 
-          'xhr-override.js', 'event-listeners.js', 
+          'xhr-override.js', 'event-listeners.js', 'session-id-generator.js',
           'element-attribute-watcher.js', 'content-scraper.js',
-          'element-creation-watcher.js', 'post-dom-callback.js'],
+          'element-creation-watcher.js', 'validation-payload-builder.js', 'post-dom-callback.js'],
         dest: 'build/edgeguard.js'
       }
     },

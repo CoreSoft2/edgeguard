@@ -5,7 +5,7 @@ DOMLoadedCallbacks.push(function() {
     var els = document.getElementsByTagName(tag);
     for (var i = 0; i < els.length; ++i) {
       var el = els[i];
-      if (el[egDataKey] == nonce) {
+      if (el[egDataKey] && el[egDataKey] == sessionId) {
         console.log('script added by eg');
         continue;
       }

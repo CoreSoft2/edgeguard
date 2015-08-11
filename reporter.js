@@ -1,4 +1,4 @@
-var endpoint = 'http://localhost:3000/events';
+
 
 var count = 0;
 var queue = [];
@@ -7,19 +7,15 @@ var maxURLQueryLength = 2048;
 
 var payloadToParams = function(data) {
   var str = ""
-  for (var i = 0; i < data.length; ++i) {
-    var el = data[i];
-    str += "data[][_]=0&"
-    for (var k in el) {
-      str += "data[][" + k + "]=" + encodeURIComponent(el[k]) + "&"
-    }
-  }
+  for (var k in data) {
+    str += "data[" + k + "]=" + encodeURIComponent(data[k]) + "&"
+  } 
   return str.slice(0, -1);
 }
 
 var deliverJSONP = function(data) {
 
-  var url = endpoint + '/generate.js?' + payloadToParams(data);  
+  var url = proto + '//' + endpoint + '/events/generate.js?' + payloadToParams(data);  
 
   console.log(url);
 
@@ -33,8 +29,8 @@ var deliverJSONP = function(data) {
 }
 
 var deliverCORS = function(data) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', endpoint + '.json');
+  var xhr = new OrigXHR();
+  xhr.open('POST', proto + '//' + endpoint + '/events');
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   var payload = payloadToParams(data);
   xhr.send(payload);
@@ -42,37 +38,49 @@ var deliverCORS = function(data) {
 
 var deliver = hasCORS ? deliverCORS : deliverJSONP
 
-var flushQueue = function() {
-  if (queue.length == 0) { return; }  
-  if (!validationSent) {
-    queue.unshift({t: 'v', mh: mouseHistorySerialized, hc: hasCORS, 
-      hmo: hasMutationObserver, ts: timestamp, 
-      dl: DOMLoadTime, hws: hasWebSockets, sid: sessionId});
-    validationSent = true;
-  } else {
-    queue.unshift({t: 'm', sid: sessionId});
+var flushQueue = function() {  
+  if (queue.length == 0 || count > maxEvents) { return; }
+  var payload = []  
+  var mouseHistory = mouseHistories.shift()
+  if (!mouseHistory) {
+    attachMouseHandler();
+    return;
   }
-  deliver(queue);
-  queue = [];
+
+  // if buffer is getting depleted, start tracking the mouse again
+  if (mouseHistories.length < (historyBufferCount / 2)) { attachMouseHandler() }
+
+  var el = queue.pop();  
+  if (!validationSent) {
+    el['hc'] = hasCORS; 
+    el['hmo'] = hasMutationObserver
+    el['ts'] = generateTimestamp()
+    el['pl'] = timestamp // page load clock time
+    el['dl'] = DOMLoadTime
+    el['hws'] = hasWebSockets
+    el['hael'] = hasAddEventListener
+    el['sd'] = true  // session data
+    validationSent = true;
+  }  
+  el['sid'] = sessionId
+  el['mh'] = serializeMouseHistory(mouseHistory)  
+  deliver(el);
+  count += 1
 }
 
 var queueLoop = function() {
   flushQueue();
-  setTimeout(queueLoop, 500);
+  setTimeout(queueLoop, 150);
 }
 
-var queuePayload = function(obj) {
-  if (maxReports && count > maxReports) {
-    return;
-  }  
-  //no queues, just send for now.
-  obj[originKey] = windowLocation.origin;
+var queuePayload = function(obj) {  
+
+  obj[originKey] = windowLocation.protocol + "//" + windowLocation.host;
   obj[pathKey] = windowLocation.pathname;
   obj[paramsKey] = windowLocation.search;
 
   queue.push(obj);  
-  
-  // count += 1;
+
 };
 
 validationReadyCallbacks.push(queueLoop);

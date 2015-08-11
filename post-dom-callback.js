@@ -3,16 +3,18 @@ var callbacksExecuted = false;
 var execCallbacks = function() {
   if (callbacksExecuted){ return; }
   DOMLoadTime = generateTimestamp() - timestamp;
-  console.log(DOMLoadTime);
   body = documentObject.body;
+  hasAddEventListener = !!body.addEventListener;
   callbacksExecuted = true;
-  for (var i = 0; i < DOMLoadedCallbacks.length; ++i){
-    DOMLoadedCallbacks[i]();
-  }
+  arrayMap(DOMLoadedCallbacks, function(func) { func() });  
 };
 
-documentObject.addEventListener('DOMContentLoaded', execCallbacks);
-documentObject.addEventListener('load', execCallbacks);
-//document.onreadystatechange = execCallbacks;
+if (documentObject.addEventListener) {
+  documentObject.addEventListener('DOMContentLoaded', execCallbacks);
+  documentObject.addEventListener('load', execCallbacks);
+}
+else {
+  document.onreadystatechange = execCallbacks;
+}
 windowObject.setTimeout(execCallbacks, 5000);
 

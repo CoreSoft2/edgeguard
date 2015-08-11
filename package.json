@@ -18,9 +18,12 @@
   "dependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-uglify": "~0.9.1",
-    "grunt-contrib-concat": "~0.5.1"
+    "grunt-contrib-concat": "~0.5.1",
+    "unzip": "~0.1.11",
+    "fstream": "~1.0.7",
+    "progress-stream": "~1.1.1",
+    "single-line-log": "~1.0.0",
+    "q": "~1.4.1"
   },
-  "devDependencies": {
-    
-  }
+  "devDependencies": {}
 }

@@ -1,6 +1,5 @@
-var Old = window.XMLHttpRequest;
 window.XMLHttpRequest = function() {
-  var orig = new Old(arguments);
+  var orig = new OrigXHR(arguments);
   var _this = this;
 
   var attributes = ['timeout', 'withCredentials', 'upload', 
@@ -19,24 +18,17 @@ window.XMLHttpRequest = function() {
     _this[attr] = orig[attr];
   };
 
-
-  //console.log(this);
-
   var syncAttributes = function() {
     for (var i = 0; i < attributes.length; ++i) {
       var attr = attributes[i];
       var newVal;
       //if our object has changed set newVal to its new value
-      if (_this[attr] != thisLast[attr]) {
+      if (_this[attr] !== thisLast[attr]) {
         newVal = _this[attr];
-        //console.log("attribute " + attr + " has changed externally, new value: ");
-        //console.log(newVal);
       }
       //if original has changed, set newVal to is new value, overwriting our own changes if so
-      if (orig[attr] != origLast[attr]) {
+      if (orig[attr] !== origLast[attr]) {
         newVal = orig[attr];
-        //console.log("attribute " + attr + " has changed internally, new value: ");
-        //console.log(newVal);
       }
 
       if (!newVal) { continue; }

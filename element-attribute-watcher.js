@@ -34,6 +34,8 @@ var detectChanges = function(el, values) {
   }
 }
 
+var elQueue = []
+
 if (hasMutationObserver) {
   
   watchElementAttributes = function(el, attributes, initialValues) {
@@ -41,17 +43,16 @@ if (hasMutationObserver) {
     var tagName = el.nodeName.toLowerCase();
     var observerCallback = function(mutationRecords) {
       var newValues = {}
-      for (var j = 0; j < mutationRecords.length; ++j) {
-        var target = mutationRecords[j].target;
-        for (var i = 0; i < attributes.length; ++i) {
+      arrayMap(mutationRecords, function(target) {
+        arrayMap(attributes, function(attribute) {        
           var attribute = attributes[i];
           newValues[attribute] = extractAttribute(target, attribute);
-        }
+        })
         var changed = detectChanges(target, newValues);
         for (var k in changed) {          
           queuePayload(buildPayload('GET', changed[k], tagName + "_" + k));
         }
-      }
+      });
     }
     var attributeObserver = new mutationObserverObject(observerCallback);
     attributeObserver.observe(el, {      
@@ -61,9 +62,62 @@ if (hasMutationObserver) {
   }
 
 } else {
-  // TODO implement alternative method of watching attributes
-  watchElementAttributes = function(el, attributes) {
-    
+
+  DOMLoadedCallbacks.push(function() {
+
+    var testNode = documentObject.createElement('P');
+    body.appendChild(testNode);
+    testNode.setAttribute('href', 'a');
+
+    var attributeChangeDetected = false;
+
+    var func = 'attachEvent'
+    var eventName = 'onpropertychange'
+    var attrNameKey = 'propertyName'    
+    var testCallback = function(event) {
+      if (event[attrNameKey] == 'href') {
+        attributeChangeDetected = true;
+      }
+    }
+
+    if (hasAddEventListener) {
+      func = 'addEventListener'
+      eventName = 'DOMAttrModified'
+      attrNameKey = 'attrName'      
+      testCallback = function(event) {
+        if (event.attrChange && event[attrNameKey] == 'href') {
+          attributeChangeDetected = true;
+        }
+      }
+    }    
+
+    testNode[func](eventName, testCallback)    
+    testNode.setAttribute('href', 'b')
+    body.removeChild(testNode)
+
+    if (attributeChangeDetected) {
+      watchElementAttributes = function(el, attributes, initialValues) {
+        setLastValues(el, initialValues)
+        var tagName = el.nodeName.toLowerCase();
+        var attributeChangedCallback = function(event) {
+          var newValues = {}          
+          var attrName = event[attrNameKey]
+          newValues[attrName] = extractAttribute(el, attrName);
+          var changed = detectChanges(el, newValues);
+          for (var k in changed) {          
+            queuePayload(buildPayload('GET', changed[k], tagName + "_" + k));
+          }
+        }
+        el[func](eventName, attributeChangedCallback);
+      }
+    } else {
+
+    }
+
+  });
+
+  watchElementAttributes = function(el, attributes, initialValues) {
+    elQueue.push({el: el, attrs: attributes, iv: initialValues});
   }
 
 }

@@ -1,12 +1,20 @@
-var generateTimestamp = function() {
-  var current = new Date();
-  return Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 
-    current.getUTCDate(), current.getUTCHours(), current.getUTCMinutes(), 
-    current.getUTCSeconds(), current.getUTCMilliseconds());
+var arrayMap = function(arr, func) {
+  var ret = []
+  for (var i = 0; i < arr.length; ++i) {
+    ret.push(func(arr[i]));
+  }
+  return ret;
 }
+
+var generateTimestamp = Date.now
+
+var endpoint = '192.168.3.7:3000';
+var proto = 'http:'
 
 var timestamp = generateTimestamp();
 var DOMLoadTime;
+
+var OrigXHR = XMLHttpRequest;
 
 var windowObject = window;
 var windowLocation = windowObject.location;
@@ -19,6 +27,10 @@ var paramsKey = 'ps'
 var urlKey = 'u'
 var sourceKey = 's'
 var methodKey = 'm'
+
+var hasAddEventListener;
+var hasDOMAttrModified;
+var hasDOMNodeInserted;
 
 var buildPayload = function(method, url, source) {
   var ret = {}
@@ -36,33 +48,60 @@ var hasCORS = 'withCredentials' in new XMLHttpRequest();
 var DOMLoadedCallbacks = [];
 var validationReadyCallbacks = [];
 
+var trimStr;
+if (String.prototype.trim !== 'function') {
+  trimStr = function(str) {
+    return str.replace(/^\s+|\s+$/g, '')
+  }
+} else {
+  trimStr = function(str) {
+    return str.trim();
+  }
+}
+
 var srcParam = 'src';
 var elementAttributes = {
   IMG: [srcParam],
   SCRIPT: [srcParam],
   OBJECT: ['data'],
   IFRAME: [srcParam],
-  LINK: ['href']
+  LINK: ['href'],
+  A: ['href'],
+  FORM: ['action']
 };
+
+var serializeMouseHistory = function(history) {
+  var str = "";
+  arrayMap(history, function(pos) {        
+    str += "," + pos.x + ":" + pos.y;
+  });
+  return str.slice(1);
+}
 
 var sessionId = null;
 
-var mouseHistory = null;
-var mouseHistorySerialized = null;
+var mouseHistories = [];
+var historyBufferCount = 20;
+
+var attachMouseHandler;
+
 
 var extractAttribute = function(element, attribute) {
   return element[attribute] || element.getAttribute(attribute);
 }
 
+var whitelist = "insert whitelist here";
+
 var domainProtoMatch = function(domain, protocol) {
-  return domain == windowLocation.host && protocol == windowLocation.protocol
+  return (domain == windowLocation.host && protocol == windowLocation.protocol) || (whitelist.indexOf(domain) > 0)
 }
+
 
 var isBadUrl = function(url) {
   if (!url) { return false; }
 
-  var trimmed = url.trim();
-  var protocol = trimmed.match(/^https?:/)[0]
+  var trimmed = trimStr(url);
+  var protocol = (trimmed.match(/^https?:/) || [])[0]
   var domain;
   if (protocol) {
     domain = trimmed.match(/^https?:\/\/([^\/]*)/)[1]
@@ -84,4 +123,5 @@ var egIdKey = "_eg_key";
 var egElementKey = "_el";
 var egDataKey = "_eg_data";
 
-var maxReports = 100;
+//the maximum number of events to send per page load
+var maxEvents = 100;

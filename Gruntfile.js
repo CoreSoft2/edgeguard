@@ -11,10 +11,10 @@ module.exports = function(grunt) {
         }
       },
       dist: {
-        src: ['globals.js', 'reporter.js', 
-          'xhr-override.js', 'event-listeners.js', 'session-id-generator.js',
-          'element-attribute-watcher.js', 'element-creation-watcher.js', 
-          'validation-payload-builder.js', 'content-scraper.js', 'post-dom-callback.js'],
+        src: ['src/globals.js', 'src/reporter.js', 'src/builtin-wrapper.js', 
+          'src/xhr-override.js', 'src/ws-override.js', 'src/event-listeners.js', 'src/session-id-generator.js',
+          'src/element-attribute-watcher.js', 'src/element-creation-watcher.js', 
+          'src/validation-payload-builder.js', 'src/content-scraper.js', 'src/post-dom-callback.js'],
         dest: 'build/edgeguard.js'
       }
     },

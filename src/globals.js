@@ -42,7 +42,7 @@ var buildPayload = function(method, url, source) {
 
 var mutationObserverObject = (windowObject.MutationObserver || windowObject.WebKitMutationObserver);
 var hasMutationObserver = !!(mutationObserverObject);
-var hasWebSockets = 'WebSocket' in window || 'MozWebSocket' in window;
+var hasWebSockets;
 var hasCORS = 'withCredentials' in new XMLHttpRequest();
 
 var DOMLoadedCallbacks = [];
@@ -90,7 +90,7 @@ var extractAttribute = function(element, attribute) {
   return element[attribute] || element.getAttribute(attribute);
 }
 
-var whitelist = "insert whitelist here";
+var whitelist = ["insert whitelist here"];
 
 var domainProtoMatch = function(domain, protocol) {
   return (domain == windowLocation.host && protocol == windowLocation.protocol) || (whitelist.indexOf(domain) > 0)
@@ -101,10 +101,10 @@ var isBadUrl = function(url) {
   if (!url) { return false; }
 
   var trimmed = trimStr(url);
-  var protocol = (trimmed.match(/^https?:/) || [])[0]
+  var protocol = (trimmed.match(/^(http|ws)s?:/) || [])[0]
   var domain;
   if (protocol) {
-    domain = trimmed.match(/^https?:\/\/([^\/]*)/)[1]
+    domain = trimmed.match(/^(http|ws)s?:\/\/([^\/]*)/)[2]
     return !domainProtoMatch(domain, protocol);
   }
 

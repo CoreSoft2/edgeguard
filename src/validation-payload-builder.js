@@ -24,8 +24,8 @@ DOMLoadedCallbacks.push(function() {
     var totalDist = distance(mousePositions[offset], mousePositions[mousePositions.length - 1]);
     if (totalDist > threshold && mousePositions.length > minSamples) {
       mouseHistories.push(mousePositions.slice(offset, mousePositions.length));
-      if (!sessionId) {
-        createSessionId();
+      if (!clientSecret) {
+        createSecret();
         arrayMap(validationReadyCallbacks, function(func) { func() });
       }
     }

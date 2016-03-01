@@ -1,40 +1,8 @@
 
-
 var count = 0;
 var queue = [];
 var validationSent = false;
 var maxURLQueryLength = 2048;
-
-var payloadToParams = function(data) {
-  var str = ""
-  for (var k in data) {
-    str += "data[" + k + "]=" + encodeURIComponent(data[k]) + "&"
-  } 
-  return str.slice(0, -1);
-}
-
-var deliverJSONP = function(data) {
-
-  var url = proto + '//' + endpoint + '/events/generate.js?' + payloadToParams(data);  
-
-  console.log(url);
-
-  var scriptNode = documentObject.createElement('SCRIPT');
-  scriptNode.setAttribute('src', url);
-  scriptNode[egDataKey] = sessionId;
-  body.appendChild(scriptNode);
-  windowObject.setTimeout(function() {
-    body.removeChild(scriptNode);
-  }, 100);
-}
-
-var deliverCORS = function(data) {
-  var xhr = new OrigXHR();
-  xhr.open('POST', proto + '//' + endpoint + '/events');
-  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  var payload = payloadToParams(data);
-  xhr.send(payload);
-}
 
 var deliver = hasCORS ? deliverCORS : deliverJSONP
 
@@ -51,18 +19,14 @@ var flushQueue = function() {
   if (mouseHistories.length < (historyBufferCount / 2)) { attachMouseHandler() }
 
   var el = queue.pop();  
-  if (!validationSent) {
-    el['hc'] = hasCORS; 
-    el['hmo'] = hasMutationObserver
+  if (!validationSent) {    
     el['ts'] = generateTimestamp()
     el['pl'] = timestamp // page load clock time
     el['dl'] = DOMLoadTime
-    el['hws'] = hasWebSockets
-    el['hael'] = hasAddEventListener
     el['sd'] = true  // session data
     validationSent = true;
   }  
-  el['sid'] = sessionId
+  //el['sid'] = sessionId
   el['mh'] = serializeMouseHistory(mouseHistory)  
   deliver(el);
   count += 1

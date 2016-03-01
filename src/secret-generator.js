@@ -1,4 +1,4 @@
-var createSessionId = function() {  
+var createSecret = function() {  
   var parts = []
   var total = 0
   var counter = 0
@@ -15,5 +15,5 @@ var createSessionId = function() {
       counter = 0;
     }
   }
-  sessionId = parts.join("");  
+  clientSecret = parts.join("");  
 }

@@ -1,9 +1,13 @@
-var arrayMap = function(arr, func) {
+function arrayMap(arr, func) {
   var ret = []
   for (var i = 0; i < arr.length; ++i) {
     ret.push(func(arr[i]));
   }
   return ret;
+}
+
+function executeAll(functions) {
+  arrayMap(functions, function(f) { f(); });
 }
 
 var generateTimestamp = Date.now
@@ -32,13 +36,24 @@ var hasAddEventListener;
 var hasDOMAttrModified;
 var hasDOMNodeInserted;
 
-var buildPayload = function(method, url, source) {
+var selfHash;
+
+// TODO crypto
+var secret = "<%= secret %>"
+
+function buildPayload(method, url, source) {
   var ret = {}
   ret[methodKey] = method
   ret[urlKey] = url
   ret[sourceKey] = source
   return ret;
 }
+
+function extractAttribute(target, attr) {
+  target.getAttribute(attr)
+}
+
+var overrides = []
 
 var mutationObserverObject = (windowObject.MutationObserver || windowObject.WebKitMutationObserver);
 var hasMutationObserver = !!(mutationObserverObject);
@@ -59,10 +74,12 @@ if (String.prototype.trim !== 'function') {
   }
 }
 
+function nop(){}
+
 var srcParam = 'src';
+//scripts are handled separately
 var elementAttributes = {
   IMG: [srcParam],
-  SCRIPT: [srcParam],
   OBJECT: ['data'],
   IFRAME: [srcParam],
   LINK: ['href'],
@@ -78,45 +95,12 @@ var serializeMouseHistory = function(history) {
   return str.slice(1);
 }
 
-var sessionId = null;
+var clientSecret = null;
 
 var mouseHistories = [];
 var historyBufferCount = 20;
 
 var attachMouseHandler;
-
-
-var extractAttribute = function(element, attribute) {
-  return element[attribute] || element.getAttribute(attribute);
-}
-
-var whitelist = ["insert whitelist here"];
-
-var domainProtoMatch = function(domain, protocol) {
-  return (domain == windowLocation.host && protocol == windowLocation.protocol) || (whitelist.indexOf(domain) > 0)
-}
-
-
-var isBadUrl = function(url) {
-  if (!url) { return false; }
-
-  var trimmed = trimStr(url);
-  var protocol = (trimmed.match(/^(http|ws)s?:/) || [])[0]
-  var domain;
-  if (protocol) {
-    domain = trimmed.match(/^(http|ws)s?:\/\/([^\/]*)/)[2]
-    return !domainProtoMatch(domain, protocol);
-  }
-
-  var relativeProto = !!trimmed.match(/^\/\//)
-  if (relativeProto) {
-    protocol = windowLocation.protocol;
-    domain = trimmed.match(/^\/\/([^\/]*)/)
-    return !domainProtoMatch(domain, protocol);
-  }
-  return false;
-
-};
 
 // assigning these to variables should allow better minification
 var egIdKey = "_eg_key";

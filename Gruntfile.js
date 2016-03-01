@@ -11,15 +11,35 @@ module.exports = function(grunt) {
         }
       },
       dist: {
-        src: ['src/globals.js', 'src/reporter.js', 'src/builtin-wrapper.js', 
-          'src/xhr-override.js', 'src/ws-override.js', 'src/event-listeners.js', 'src/session-id-generator.js',
-          'src/element-attribute-watcher.js', 'src/element-creation-watcher.js', 
-          'src/validation-payload-builder.js', 'src/content-scraper.js', 'src/post-dom-callback.js'],
-        dest: 'build/edgeguard.js'
+        src: ['src/globals.js',
+          'src/secret-generator.js', 
+          'src/lib/**/*.js',
+          'src/overrides/*.js',
+          'src/reporter/methods/*.js',
+          'src/reporter/*.js',
+          'src/detectives/**/*.js',
+          'src/entry-point.js',
+          'src/event-listeners.js',
+          'src/session-id-generator.js',          
+          'src/element-attribute-watcher.js',
+          'src/element-creation-watcher.js',          
+          'src/validation-payload-builder.js',
+          'src/content-scraper.js',
+          'src/script-scraper.js',          
+          'src/post-dom-callback.js'
+        ],
+        dest: 'build/edgeguard.js',
+        options: {
+          banner: "var boot = this;\n(function(){\n"
+        }
+      },
+      bootstrap: {
+        src: ['src/bootstrap/*.js'],
+        dest: 'build/snippet.js'
       }
     },
     uglify: {
-      build: {
+      dist: {
         src: 'build/edgeguard.js',
         dest: 'build/edgeguard.min.js'
       }
@@ -28,9 +48,13 @@ module.exports = function(grunt) {
       options: {
         compilationLevel: 'ADVANCED_OPTIMIZATIONS'
       },
-      build: {
+      dist: {
         src: 'build/edgeguard.js',
         dest: 'build/edgeguard.compiled.js'
+      },
+      bootstrap: {
+        src: 'build/snippet.js',
+        dest: 'build/snippet.compiled.js'
       }
     }   
   });
@@ -40,6 +64,8 @@ module.exports = function(grunt) {
 
   grunt.loadTasks('tasks')
 
-  grunt.registerTask('default', ['concat', 'uglify', 'closureCompile']);
+  grunt.registerTask('build', ['concat:dist', 'uglify:dist', 'closureCompile:dist']);
+  grunt.registerTask('bootstrap', ['concat:bootstrap', 'closureCompile:bootstrap'])
+  grunt.registerTask('default', ['concat:dist'])
 
 }

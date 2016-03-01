@@ -3,7 +3,7 @@ DOMLoadedCallbacks.push(function() {
   var registerNewElement = function(el, type) {
     var attributes = elementAttributes[type];
     var originalValues = {}
-    if (extractAttribute(el, egDataKey) == sessionId) { return; }      
+    if (extractAttribute(el, egDataKey) == clientSecret) { return; }      
     arrayMap(attributes, function(attribute) {    
       var val = extractAttribute(el, attribute);
       originalValues[attribute] = val;

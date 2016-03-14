@@ -24,7 +24,7 @@ overrides.push(function() {
     altered.send = function() {
       syncAttributes();
       if (isBadUrl(altered._url)) {
-        queuePayload({method: altered._method, url: altered._url, source: 'XHR'});
+        queuePayload(buildPayload(altered._method, altered._url, 'XHR'));        
       }
       var ret = orig.send.apply(orig, arguments);
       syncAttributes();

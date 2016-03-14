@@ -3,35 +3,29 @@ DOMLoadedCallbacks.push(function() {
 
   if (hasAddEventListener) {
 
-    body.addEventListener("click", function(e) {
+    documentObject.addEventListener("click", function(e) {
       var target = e.target;
       if (target.nodeName == 'A') {
         var href = extractAttribute(target, 'href');
-        if (isBadUrl(href)) {
-          e.preventDefault();
-          queuePayload({method: 'GET', url: href, source: 'link_click'})
-          flushQueue();        
-          windowObject.setTimeout(function() {
-            windowLocation.href = href;
-          }, 100);
+        if (isBadUrl(href)) {          
+          reportSync(buildPayload('GET', href, 'link_click'))
+          redirect = false
         }      
       };
     });
 
-    body.addEventListener("submit", function(e) {
+    documentObject.addEventListener("submit", function(e) {
+      console.log("form submit: ", e)
       var target = e.target;
       if (target.nodeName == 'FORM') {
         var action = extractAttribute(target, 'action');
         var method = extractAttribute(target, 'method');
         if (!method) { method = 'GET' };
         if (isBadUrl(action)) {
-          console.log('remote');
-          e.preventDefault();
-          queuePayload({method: method, url: action, source: 'form_submit'});
-          flushQueue();
-          windowObject.setTimeout(function() {
-            target.submit();
-          }, 100);
+          var obj = buildPayload(method.toUpperCase(), action, 'form_submit')
+          populatePayload(obj)
+          deliverJSONP(obj)                              
+          redirect = false
         }
       }
       return true;

@@ -16,17 +16,17 @@ module.exports = function(grunt) {
           'src/lib/**/*.js',
           'src/overrides/*.js',
           'src/reporter/methods/*.js',
-          'src/reporter/*.js',
+          'src/reporter.js',          
           'src/detectives/**/*.js',
-          'src/entry-point.js',
+          'src/navigation-check.js',
           'src/event-listeners.js',
-          'src/session-id-generator.js',          
+          'src/session-id-generator.js',
           'src/element-attribute-watcher.js',
-          'src/element-creation-watcher.js',          
+          'src/element-creation-watcher.js',
           'src/validation-payload-builder.js',
           'src/content-scraper.js',
-          'src/script-scraper.js',          
-          'src/post-dom-callback.js'
+          'src/script-scraper.js',
+          'src/entry-point.js'
         ],
         dest: 'build/edgeguard.js',
         options: {
@@ -64,8 +64,20 @@ module.exports = function(grunt) {
 
   grunt.loadTasks('tasks')
 
-  grunt.registerTask('build', ['concat:dist', 'uglify:dist', 'closureCompile:dist']);
-  grunt.registerTask('bootstrap', ['concat:bootstrap', 'closureCompile:bootstrap'])
+  grunt.registerTask('build', function(target) {
+    var tasks = ['concat:dist', 'uglify:dist']
+    if (target == 'compile') {
+      tasks.push('closureCompile:dist')
+    }
+    grunt.task.run(tasks)
+  });
+  grunt.registerTask('bootstrap', function(target) {
+    var tasks = ['concat:bootstrap']
+    if (target == 'compile') {
+      tasks.push('closureCompile:bootstrap')
+    }
+    grunt.task.run(tasks)
+  })
   grunt.registerTask('default', ['concat:dist'])
 
 }

@@ -36,6 +36,10 @@ var detectChanges = function(el, values) {
 
 var elQueue = []
 
+function getAttrChangedVector(tagName, attribute) {
+  return tagName + "_" + attribute + "_mutate";
+}
+
 if (hasMutationObserver) {
   
   watchElementAttributes = function(el, attributes, initialValues) {
@@ -43,14 +47,14 @@ if (hasMutationObserver) {
     var tagName = el.nodeName.toLowerCase();
     var observerCallback = function(mutationRecords) {
       var newValues = {}
-      arrayMap(mutationRecords, function(target) {
-        arrayMap(attributes, function(attribute) {        
-          var attribute = attributes[i];
+      arrayMap(mutationRecords, function(record) {
+        var target = record.target;
+        arrayMap(attributes, function(attribute) {                
           newValues[attribute] = extractAttribute(target, attribute);
         })
         var changed = detectChanges(target, newValues);
         for (var k in changed) {          
-          queuePayload(buildPayload('GET', changed[k], tagName + "_" + k));
+          queuePayload(buildPayload('GET', changed[k], getAttrChangedVector(tagName, k)));
         }
       });
     }
@@ -61,6 +65,7 @@ if (hasMutationObserver) {
     });
   }
 
+// if we don't have mutation observers, then try onpropertychange event
 } else {
 
   DOMLoadedCallbacks.push(function() {
@@ -105,14 +110,19 @@ if (hasMutationObserver) {
           newValues[attrName] = extractAttribute(el, attrName);
           var changed = detectChanges(el, newValues);
           for (var k in changed) {          
-            queuePayload(buildPayload('GET', changed[k], tagName + "_" + k));
+            queuePayload(buildPayload('GET', changed[k], getAttrChangedVector(tagName, k)));
           }
         }
         el[func](eventName, attributeChangedCallback);
       }
+    // if onpropertychange event doesn't work, instrument setAttribute
     } else {
 
     }
+
+    arrayMap(elQueue, function(elementData) {
+      watchElementAttributes(elementData.el, elementData.attrs, elementData.iv)
+    })
 
   });
 

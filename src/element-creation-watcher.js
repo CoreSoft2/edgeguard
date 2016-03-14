@@ -1,25 +1,27 @@
 DOMLoadedCallbacks.push(function() {
 
+  console.log("element-creation-watcher")
+
   var registerNewElement = function(el, type) {
     var attributes = elementAttributes[type];
     var originalValues = {}
-    if (extractAttribute(el, egDataKey) == clientSecret) { return; }      
+    //if (extractAttribute(el, egDataKey) == clientSecret) { return; }
     arrayMap(attributes, function(attribute) {    
       var val = extractAttribute(el, attribute);
       originalValues[attribute] = val;
       if (isBadUrl(val)) {        
-        queuePayload(buildPayload('GET', val, type + "_" + attribute));
+        queuePayload(buildPayload('GET', val, type.toLowerCase() + "_" + attribute + "_create"));
       }
     })
     watchElementAttributes(el, attributes, originalValues);
   }
 
-  if (hasMutationObserver) {
-    var callback = function(mutationRecords) {
+  if (hasMutationObserver) {    
+    var callback = function(mutationRecords) {      
       arrayMap(mutationRecords, function(record) {
         arrayMap(record.addedNodes, function(node) {          
-          for (var tagName in elementAttributes) {
-            if (node.tagName == tagName) {
+          for (var tagName in elementAttributes) {            
+            if (node.tagName === tagName) {              
               registerNewElement(node, tagName);
               break;
             }

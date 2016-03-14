@@ -10,10 +10,10 @@ executeAll(overrides);
 // then load remaining async scripts
 var asyncQueuePointer = 0;
 
-function evaluateScripts() {
-  while (boot["asq"][asyncQueuePointer] && boot["asq"][asyncQueuePointer]["src"]) {
+function evaluateScripts() {  
+  while (boot["asq"][asyncQueuePointer] && boot["asq"][asyncQueuePointer]["src"]) {    
     eval(boot["asq"][asyncQueuePointer]["src"]);
-    ++asyncQueuePointer;
+    asyncQueuePointer += 1;
   }
 }
 
@@ -23,34 +23,55 @@ arrayMap(boot["asq"], function(el) {
   }
 })
 
+boot['sfh'] = function(scriptObj) {
+  scriptObj['cb'] = evaluateScripts
+}
+
 evaluateScripts();
 
 // then hash the source of this js
 
 selfHash = murmurDigest(boot["src"]);
-console.log(selfHash);
 
 // now lets sort out the DOM loaded events
+
 
 var callbacksExecuted = false;
 var execCallbacks = function() {
   if (callbacksExecuted){ return; }
+  callbacksExecuted = true;
   DOMLoadTime = generateTimestamp() - timestamp;
   body = documentObject.body;
   hasAddEventListener = !!body.addEventListener;
-  callbacksExecuted = true;
-  executeAll(DOMLoadedCallbacks);  
-  prepareInitialReport();  
+  for (var i = 0; i < DOMLoadedCallbacks.length; ++i) {
+    DOMLoadedCallbacks[i]()
+  }
+  //executeAll(DOMLoadedCallbacks);  
+  //prepareInitialReport();
+  windowObject.clearInterval(boot['lh'])
 };
 
+var cbProxy = function(label) {
+  return function() {
+    console.log(label)
+    execCallbacks()
+  }
+}
+
+windowObject.onload = cbProxy('onload')
+
 if (documentObject.addEventListener) {
-  documentObject.addEventListener('DOMContentLoaded', execCallbacks);
-  documentObject.addEventListener('load', execCallbacks);
+  documentObject.addEventListener('DOMContentLoaded', cbProxy('DOMContentLoaded'));
+  windowObject.addEventListener('load', cbProxy('window.load'));
 }
 else {
-  document.onreadystatechange = execCallbacks;
+  document.onreadystatechange = function() {
+    cbProxy('onreadystatechange')()    
+  }
 }
 if (document.readyState === 'complete') {
-  execCallbacks();
+  cbProxy('readyState')()  
 }
-windowObject.setTimeout(execCallbacks, 5000);
+windowObject.setTimeout(function() {
+  cbProxy('timeout')()
+}, 5000);

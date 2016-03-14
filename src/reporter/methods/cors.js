@@ -3,7 +3,7 @@
 
 var deliverCORS = function(data) {
   var xhr = new OrigXHR();
-  xhr.open('POST', proto + '//' + endpoint + '/events');
+  xhr.open('POST', proto + '//' + endpoint + '/events.json');
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   var payload = payloadToParams(data);
   xhr.send(payload);

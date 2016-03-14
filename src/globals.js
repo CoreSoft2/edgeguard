@@ -10,6 +10,14 @@ function executeAll(functions) {
   arrayMap(functions, function(f) { f(); });
 }
 
+DEBUG = true
+
+function debugLog() {
+  if (DEBUG) {
+    console.log.apply(console, arguments)    
+  }
+}
+
 var generateTimestamp = Date.now
 
 var endpoint = '192.168.3.7:3000';
@@ -25,6 +33,13 @@ var windowLocation = windowObject.location;
 var documentObject = document;
 var body = null;
 
+// we need this to figure out if someone has changed window.location in a script
+var originalHref = windowLocation.href;
+
+// this variable is set to true if we can determine what caused the navigation
+// we can catch link clicks, form submit, F5 pressed, Ctrl + R pressed
+var validNavigation = false;
+
 var originKey = 'o'
 var pathKey = 'p'
 var paramsKey = 'ps'
@@ -38,6 +53,8 @@ var hasDOMNodeInserted;
 
 var selfHash;
 
+var origin = windowLocation.host
+
 // TODO crypto
 var secret = "<%= secret %>"
 
@@ -46,11 +63,13 @@ function buildPayload(method, url, source) {
   ret[methodKey] = method
   ret[urlKey] = url
   ret[sourceKey] = source
+  ret[originKey] = origin
   return ret;
 }
 
 function extractAttribute(target, attr) {
-  target.getAttribute(attr)
+  console.log(target, attr)
+  return target[attr] || target.getAttribute(attr)
 }
 
 var overrides = []
@@ -77,14 +96,15 @@ if (String.prototype.trim !== 'function') {
 function nop(){}
 
 var srcParam = 'src';
-//scripts are handled separately
+
 var elementAttributes = {
   IMG: [srcParam],
   OBJECT: ['data'],
   IFRAME: [srcParam],
   LINK: ['href'],
   A: ['href'],
-  FORM: ['action']
+  FORM: ['action'],
+  SCRIPT: [srcParam]
 };
 
 var serializeMouseHistory = function(history) {
@@ -94,6 +114,37 @@ var serializeMouseHistory = function(history) {
   });
   return str.slice(1);
 }
+
+var whitelist = ['code.jquery.com', 'www.google.com', 'hiderefer.com', endpoint]
+console.log(whitelist)
+
+var domainProtoMatch = function(domain, protocol) {
+  return (domain == windowLocation.host && protocol == windowLocation.protocol) || (whitelist.indexOf(domain) >= 0)
+}
+
+var isBadUrl = function(url) {
+  if (!url) { return false; }
+
+  var trimmed = trimStr(url);
+  var protocol = (trimmed.match(/^(http|ws)s?:/) || [])[0]
+  var domain;
+  console.log(url)
+  console.log("protocol: " + protocol)
+  if (protocol) {
+    domain = trimmed.match(/^(http|ws)s?:\/\/([^\/]*)/)[2]
+    console.log("domain: " + domain)
+    return !domainProtoMatch(domain, protocol);
+  }
+
+  var relativeProto = !!trimmed.match(/^\/\//)
+  if (relativeProto) {
+    protocol = windowLocation.protocol;
+    domain = trimmed.match(/^\/\/([^\/]*)/)
+    return !domainProtoMatch(domain, protocol);
+  }
+  return false;
+
+};
 
 var clientSecret = null;
 

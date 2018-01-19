@@ -10,8 +10,9 @@ executeAll(overrides);
 // then load remaining async scripts
 var asyncQueuePointer = 0;
 
-function evaluateScripts() {  
-  while (boot["asq"][asyncQueuePointer] && boot["asq"][asyncQueuePointer]["src"]) {    
+function evaluateScripts() {
+  while (boot["asq"][asyncQueuePointer] && boot["asq"][asyncQueuePointer]["src"]) {
+    debugLog("Evaluating " + boot["asq"][asyncQueuePointer]["vsrc"])
     eval(boot["asq"][asyncQueuePointer]["src"]);
     asyncQueuePointer += 1;
   }
@@ -46,14 +47,14 @@ var execCallbacks = function() {
   for (var i = 0; i < DOMLoadedCallbacks.length; ++i) {
     DOMLoadedCallbacks[i]()
   }
-  //executeAll(DOMLoadedCallbacks);  
+  //executeAll(DOMLoadedCallbacks);
   //prepareInitialReport();
   windowObject.clearInterval(boot['lh'])
 };
 
 var cbProxy = function(label) {
+  debugLog("entry-point, callback: " + label)
   return function() {
-    console.log(label)
     execCallbacks()
   }
 }
@@ -66,11 +67,11 @@ if (documentObject.addEventListener) {
 }
 else {
   document.onreadystatechange = function() {
-    cbProxy('onreadystatechange')()    
+    cbProxy('onreadystatechange')()
   }
 }
 if (document.readyState === 'complete') {
-  cbProxy('readyState')()  
+  cbProxy('readyState')()
 }
 windowObject.setTimeout(function() {
   cbProxy('timeout')()

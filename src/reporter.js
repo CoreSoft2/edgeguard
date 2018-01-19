@@ -4,7 +4,7 @@ var queue = [];
 var validationSent = false;
 var maxURLQueryLength = 2048;
 
-var populatePayload = function(obj) {  
+var populatePayload = function(obj) {
   obj[originKey] = windowLocation.protocol + "//" + windowLocation.host;
   obj[pathKey] = windowLocation.pathname;
   obj[paramsKey] = windowLocation.search;
@@ -16,7 +16,7 @@ if (navigator && navigator.sendBeacon) {
   reportSync = function(obj) {
     populatePayload(obj)
     var blob = new Blob([JSON.stringify({data: obj})], {type: 'application/json; charset=UTF-8'})
-    console.log("sending blob: " + obj)
+    debugLog("sending blob: " + obj)
     navigator.sendBeacon(proto + "//" + endpoint + '/events.json', blob)
   }
 } else {
@@ -26,9 +26,9 @@ if (navigator && navigator.sendBeacon) {
   }
 }
 
-var flushQueue = function() {  
+var flushQueue = function() {
   if (queue.length == 0 || count > maxEvents) { return; }
-  var payload = []  
+  var payload = []
   var mouseHistory = mouseHistories.shift()
   // if (!mouseHistory) {
   //   attachMouseHandler();
@@ -38,16 +38,16 @@ var flushQueue = function() {
   // if buffer is getting depleted, start tracking the mouse again
   if (mouseHistories.length < (historyBufferCount / 2)) { attachMouseHandler() }
 
-  var el = queue.pop();  
-  if (!validationSent) {    
+  var el = queue.pop();
+  if (!validationSent) {
     el['ts'] = generateTimestamp()
     el['pl'] = timestamp // page load clock time
     el['dl'] = DOMLoadTime
     el['sd'] = true  // session data
     validationSent = true;
-  }  
+  }
   //el['sid'] = sessionId
-  //el['mh'] = serializeMouseHistory(mouseHistory)  
+  //el['mh'] = serializeMouseHistory(mouseHistory)
   deliver(el);
   count += 1
 }
@@ -59,13 +59,13 @@ var queueLoop = function() {
 }
 
 
-var queuePayload = function(obj) {  
+var queuePayload = function(obj) {
 
-  console.log('queuing', obj)
+  debugLog('queuing', obj)
 
   populatePayload(obj)
 
-  queue.push(obj);  
+  queue.push(obj);
   clearTimeout(queueTimer);
   queueLoop();
 

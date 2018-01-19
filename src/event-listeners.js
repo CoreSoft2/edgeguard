@@ -7,15 +7,14 @@ DOMLoadedCallbacks.push(function() {
       var target = e.target;
       if (target.nodeName == 'A') {
         var href = extractAttribute(target, 'href');
-        if (isBadUrl(href)) {          
+        if (isBadUrl(href)) {
           reportSync(buildPayload('GET', href, 'link_click'))
           redirect = false
-        }      
+        }
       };
     });
 
     documentObject.addEventListener("submit", function(e) {
-      console.log("form submit: ", e)
       var target = e.target;
       if (target.nodeName == 'FORM') {
         var action = extractAttribute(target, 'action');
@@ -24,7 +23,7 @@ DOMLoadedCallbacks.push(function() {
         if (isBadUrl(action)) {
           var obj = buildPayload(method.toUpperCase(), action, 'form_submit')
           populatePayload(obj)
-          deliverJSONP(obj)                              
+          deliverJSONP(obj)
           redirect = false
         }
       }
@@ -34,6 +33,3 @@ DOMLoadedCallbacks.push(function() {
   }
 
 });
-
-
-

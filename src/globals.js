@@ -14,13 +14,13 @@ DEBUG = true
 
 function debugLog() {
   if (DEBUG) {
-    console.log.apply(console, arguments)    
+    console.log.apply(console, arguments)
   }
 }
 
 var generateTimestamp = Date.now
 
-var endpoint = '192.168.3.7:3000';
+var endpoint = 'edgeguard.local.edgescan.com';
 var proto = 'http:'
 
 var timestamp = generateTimestamp();
@@ -68,7 +68,7 @@ function buildPayload(method, url, source) {
 }
 
 function extractAttribute(target, attr) {
-  console.log(target, attr)
+  debugLog(target, attr)
   return target[attr] || target.getAttribute(attr)
 }
 
@@ -109,14 +109,13 @@ var elementAttributes = {
 
 var serializeMouseHistory = function(history) {
   var str = "";
-  arrayMap(history, function(pos) {        
+  arrayMap(history, function(pos) {
     str += "," + pos.x + ":" + pos.y;
   });
   return str.slice(1);
 }
 
 var whitelist = ['code.jquery.com', 'www.google.com', 'hiderefer.com', endpoint]
-console.log(whitelist)
 
 var domainProtoMatch = function(domain, protocol) {
   return (domain == windowLocation.host && protocol == windowLocation.protocol) || (whitelist.indexOf(domain) >= 0)
@@ -128,11 +127,8 @@ var isBadUrl = function(url) {
   var trimmed = trimStr(url);
   var protocol = (trimmed.match(/^(http|ws)s?:/) || [])[0]
   var domain;
-  console.log(url)
-  console.log("protocol: " + protocol)
   if (protocol) {
     domain = trimmed.match(/^(http|ws)s?:\/\/([^\/]*)/)[2]
-    console.log("domain: " + domain)
     return !domainProtoMatch(domain, protocol);
   }
 

@@ -21,13 +21,13 @@ function isNative(name, funcString) {
 function detectSideEffects() {
   for (name in constructors) {
     if (!isNative(name, "" + constructors[name])) {
-      console.log(name + " has been overridden")
+      debugLog(name + " has been overridden")
     }
   }
   for (objectName in builtinMethods) {
     arrayMap(builtinMethods[objectName], function(method) {
       if (!isNative(method, "" + window[objectName].prototype[method])) {
-        console.log(objectName + "." + method + " has been overridden")
+        debugLog(objectName + "." + method + " has been overridden")
       }
     })
   }

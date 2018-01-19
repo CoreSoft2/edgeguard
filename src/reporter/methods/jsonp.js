@@ -2,9 +2,9 @@
 
 var deliverJSONP = function(data) {
 
-  var url = proto + '//' + endpoint + '/events/generate.js?' + payloadToParams(data);  
+  var url = proto + '//' + endpoint + '/events/generate.js?' + payloadToParams(data);
 
-  console.log(url);
+  debugLog(url);
 
   var scriptNode = documentObject.createElement('SCRIPT');
   scriptNode.setAttribute('src', url);

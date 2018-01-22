@@ -1,3 +1,4 @@
+// This generates the initial payload to edgeguard
 
 DOMLoadedCallbacks.push(function() {
   var trackingMouse = true;
@@ -6,13 +7,13 @@ DOMLoadedCallbacks.push(function() {
   var threshold = 100;
   var maxSamples = 128;
   var minSamples = 64;
-  
+
   var mouseHandlerAttached = false;
   var distance = function(p1, p2) {
     return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
   };
   var mouseMove = function(x, y) {
-    if (mouseHistories.length > historyBufferCount) { 
+    if (mouseHistories.length > historyBufferCount) {
       documentObject.mouseMove = null;
       mouseHandlerAttached = false;
       return;
@@ -29,13 +30,13 @@ DOMLoadedCallbacks.push(function() {
         arrayMap(validationReadyCallbacks, function(func) { func() });
       }
     }
-  };  
+  };
   attachMouseHandler = function() {
     if (mouseHandlerAttached) { return; }
     mouseHandlerAttached = true;
     documentObject.onmousemove = function(event) {
       var e = event || window.event;
-      mouseMove(e.clientX, e.clientY);    
+      mouseMove(e.clientX, e.clientY);
     };
   }
 

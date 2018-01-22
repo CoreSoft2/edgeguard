@@ -1,3 +1,5 @@
+// Global functions and configuration parameters
+
 function arrayMap(arr, func) {
   var ret = []
   for (var i = 0; i < arr.length; ++i) {
@@ -10,6 +12,7 @@ function executeAll(functions) {
   arrayMap(functions, function(f) { f(); });
 }
 
+// useful for turning on and off logging globablly
 DEBUG = true
 
 function debugLog() {

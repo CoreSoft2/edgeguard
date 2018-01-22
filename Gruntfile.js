@@ -12,11 +12,11 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['src/globals.js',
-          'src/secret-generator.js', 
+          'src/secret-generator.js',
           'src/lib/**/*.js',
           'src/overrides/*.js',
           'src/reporter/methods/*.js',
-          'src/reporter.js',          
+          'src/reporter.js',
           'src/detectives/**/*.js',
           'src/navigation-check.js',
           'src/event-listeners.js',
@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         src: 'build/snippet.js',
         dest: 'build/snippet.compiled.js'
       }
-    }   
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');

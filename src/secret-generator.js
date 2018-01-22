@@ -1,4 +1,6 @@
-var createSecret = function() {  
+// This creates a secret number by using mouse movement and Math.random
+
+var createSecret = function() {
   var parts = []
   var total = 0
   var counter = 0
@@ -15,5 +17,5 @@ var createSecret = function() {
       counter = 0;
     }
   }
-  clientSecret = parts.join("");  
+  clientSecret = parts.join("");
 }

@@ -1,3 +1,6 @@
+// This code detects whether any timers have already been added, so we can
+// tell whether any code we don't know about will be run
+
 var initialTimerCount = 2;
 // one timer in bootstrap.js to check scripts (1)
 

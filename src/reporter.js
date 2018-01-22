@@ -1,3 +1,4 @@
+// This file contains the code for sending payloads to the edgeguard backend
 
 var count = 0;
 var queue = [];

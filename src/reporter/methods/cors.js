@@ -1,4 +1,4 @@
-
+// Deliver payload using XHR/CORS
 //TODO detect IE < 11 and use XDR
 
 var deliverCORS = function(data) {

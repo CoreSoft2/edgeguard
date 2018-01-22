@@ -1,3 +1,5 @@
+// Initial scrape of the DOM to check potentially dangerous attributes
+
 DOMLoadedCallbacks.push(function() {
 
   for (tag in elementAttributes) {
@@ -10,7 +12,7 @@ DOMLoadedCallbacks.push(function() {
         initialValues[attribute] = val;
         if (isBadUrl(val)) {
           var method = tag === 'FORM' ? (extractAttribute(el, 'method') || 'GET') : 'GET';
-          queuePayload(buildPayload(method.toUpperCase(), val, tag.toLowerCase() + "_" + attribute))          
+          queuePayload(buildPayload(method.toUpperCase(), val, tag.toLowerCase() + "_" + attribute))
         }
       })
       watchElementAttributes(el, attributes, initialValues);

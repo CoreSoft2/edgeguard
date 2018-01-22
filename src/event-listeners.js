@@ -1,3 +1,6 @@
+// This listens for events that cause navigation, i.e. clicking on an
+// anchor or submitting a form
+
 
 DOMLoadedCallbacks.push(function() {
 

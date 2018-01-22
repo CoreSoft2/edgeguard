@@ -1,3 +1,5 @@
+// Entry point for edgeguard
+
 
 // first let's detect any side effects from code loaded before this script
 detectSideEffects();

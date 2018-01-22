@@ -1,3 +1,6 @@
+// The element creation watcher allows you to watch DOM element creation, so you can catch
+// malicious code creating new dangerous elements, e.g. form 
+
 DOMLoadedCallbacks.push(function() {
 
 
@@ -28,7 +31,7 @@ DOMLoadedCallbacks.push(function() {
     var callback = function(mutationRecords) {
       arrayMap(mutationRecords, function(record) {
         arrayMap(record.addedNodes, function(node) {
-          descendTree(node)          
+          descendTree(node)
         })
       })
     }

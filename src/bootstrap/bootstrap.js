@@ -1,4 +1,6 @@
-// js: 
+// This file is compiled into the snippet to be included inline in the application
+
+// js:
 // asq: async script queue
 // sfh: script found hook, called when new script is found
 
@@ -11,7 +13,7 @@ var scriptObj = {}
 var vscriptObj = {}
 var myLoop;
 
-function finish() {  
+function finish() {
   for (var k in scriptObj) { boot["js"].push(k); };
   eval(boot["src"]);
 }
@@ -36,7 +38,7 @@ function queueScript(vsrc) {
   vscriptObj[vsrc] = 1;
   var obj = {vsrc: vsrc}
   if (boot['sfh']) { boot['sfh'](obj) };
-  boot["asq"].push(obj);            
+  boot["asq"].push(obj);
   loadScriptAsync(vsrc, function(resp) {
     obj["src"] = resp;
     if (obj["cb"]) {
@@ -49,7 +51,7 @@ function queueScript(vsrc) {
 function checkScripts() {
   var els = document.scripts;
   for (var i = 0; i < els.length; ++i) {
-    var el = els[i];    
+    var el = els[i];
     scriptObj[el.src] = 1;
     var vsrc = el.getAttribute('vsrc');
     if (vsrc && !vscriptObj[vsrc]) {
@@ -59,5 +61,5 @@ function checkScripts() {
 }
 boot['lh'] = setInterval(checkScripts, 10);
 
-// expose check scripts to boot object to continue in edgeguard.js 
+// expose check scripts to boot object to continue in edgeguard.js
 boot["cs"] = checkScripts

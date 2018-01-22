@@ -1,3 +1,4 @@
+// Deliver payloads using JSONP, for use when CORS is not supported
 // TODO split large payloads (max size is 2048 bytes)
 
 var deliverJSONP = function(data) {

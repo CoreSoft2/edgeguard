@@ -1,10 +1,12 @@
+// Override the WebSocket constructor
+
 overrides.push(function() {
 
   var wsAttributes = ['readyState', 'bufferedAmount', 'url']
   var wsHandlers = ['onopen', 'onmessage', 'onclose']
   var wsMethods = ['send', 'close']
 
-  var instrumentWS = function(original, altered, originalArguments, syncAttributes) {  
+  var instrumentWS = function(original, altered, originalArguments, syncAttributes) {
     queuePayload({method: 'WS', url: originalArguments[0], source: 'WS'});
   }
 

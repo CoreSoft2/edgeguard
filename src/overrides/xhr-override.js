@@ -1,11 +1,13 @@
+// Override the XMLHttpRequest constructor
+
 overrides.push(function() {
 
-  var xhrAttributes = ['timeout', 'withCredentials', 'upload', 
+  var xhrAttributes = ['timeout', 'withCredentials', 'upload',
     'responseURL', 'status', 'statusText', 'responseType',
     'response', 'responseText', 'responseXML', 'readyState']
 
   var xhrHandlers = ['onloadstart',
-    'onprogress', 'onabort', 'onerror', 'onload', 
+    'onprogress', 'onabort', 'onerror', 'onload',
     'ontimeout', 'onloadend', 'onreadystatechange']
 
   var xhrMethods = ['setRequestHeader', 'getResponseHeader', 'getAllResponseHeaders', 'overrideMimeType']
@@ -24,7 +26,7 @@ overrides.push(function() {
     altered.send = function() {
       syncAttributes();
       if (isBadUrl(altered._url)) {
-        queuePayload(buildPayload(altered._method, altered._url, 'XHR'));        
+        queuePayload(buildPayload(altered._method, altered._url, 'XHR'));
       }
       var ret = orig.send.apply(orig, arguments);
       syncAttributes();

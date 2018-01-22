@@ -1,3 +1,5 @@
+// This code tries to detect whether builtin classes have been overridden already
+
 var constructorNames = ["XMLHttpRequest", "WebSocket", "MozWebSocket", "XDomainRequest"]
 
 var constructors = {}

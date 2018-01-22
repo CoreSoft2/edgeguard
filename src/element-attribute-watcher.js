@@ -1,10 +1,13 @@
+// The element attribute watcher allows you to watch for changes to attributes on DOM elements
+// e.g. watch for malicious code changing the value of the 'action' parameter on a form
+
 var watchElementAttributes;
 
 var lastElAttributes = {};
 var lastId = 0;
 var nextId = function() {
   return lastId++;
-} 
+}
 
 var setLastValues = function(el, values) {
   var id = nextId();
@@ -41,7 +44,7 @@ function getAttrChangedVector(tagName, attribute) {
 }
 
 if (hasMutationObserver) {
-  
+
   watchElementAttributes = function(el, attributes, initialValues) {
     setLastValues(el, initialValues);
     var tagName = el.nodeName.toLowerCase();
@@ -49,17 +52,17 @@ if (hasMutationObserver) {
       var newValues = {}
       arrayMap(mutationRecords, function(record) {
         var target = record.target;
-        arrayMap(attributes, function(attribute) {                
+        arrayMap(attributes, function(attribute) {
           newValues[attribute] = extractAttribute(target, attribute);
         })
         var changed = detectChanges(target, newValues);
-        for (var k in changed) {          
+        for (var k in changed) {
           queuePayload(buildPayload('GET', changed[k], getAttrChangedVector(tagName, k)));
         }
       });
     }
     var attributeObserver = new mutationObserverObject(observerCallback);
-    attributeObserver.observe(el, {      
+    attributeObserver.observe(el, {
       attributes: true,
       attributeFilter: attributes
     });
@@ -78,7 +81,7 @@ if (hasMutationObserver) {
 
     var func = 'attachEvent'
     var eventName = 'onpropertychange'
-    var attrNameKey = 'propertyName'    
+    var attrNameKey = 'propertyName'
     var testCallback = function(event) {
       if (event[attrNameKey] == 'href') {
         attributeChangeDetected = true;
@@ -88,15 +91,15 @@ if (hasMutationObserver) {
     if (hasAddEventListener) {
       func = 'addEventListener'
       eventName = 'DOMAttrModified'
-      attrNameKey = 'attrName'      
+      attrNameKey = 'attrName'
       testCallback = function(event) {
         if (event.attrChange && event[attrNameKey] == 'href') {
           attributeChangeDetected = true;
         }
       }
-    }    
+    }
 
-    testNode[func](eventName, testCallback)    
+    testNode[func](eventName, testCallback)
     testNode.setAttribute('href', 'b')
     body.removeChild(testNode)
 
@@ -105,11 +108,11 @@ if (hasMutationObserver) {
         setLastValues(el, initialValues)
         var tagName = el.nodeName.toLowerCase();
         var attributeChangedCallback = function(event) {
-          var newValues = {}          
+          var newValues = {}
           var attrName = event[attrNameKey]
           newValues[attrName] = extractAttribute(el, attrName);
           var changed = detectChanges(el, newValues);
-          for (var k in changed) {          
+          for (var k in changed) {
             queuePayload(buildPayload('GET', changed[k], getAttrChangedVector(tagName, k)));
           }
         }
